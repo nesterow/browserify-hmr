@@ -510,6 +510,9 @@ function main(
           }
           if (updatedNames) {
             console.log('[HMR] Updated modules', updatedNames);
+            setTimeout(function(){
+              if (window.location) location.reload();
+            },300);
             if (outdatedModules.length !== updatedNames.length) {
               var notUpdatedNames = filter(outdatedModules, function(name) {
                 return updatedNames.indexOf(name) === -1;
