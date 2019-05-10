@@ -422,11 +422,13 @@ function main(
       var queuedUpdateMessages = [];
       socket.on('sync confirm', function() {
         console.log('[HMR] Websocket connection successful.');
+        document.dispatchEvent(new CustomEvent('hmr:connected', { detail: true }))
         isAcceptingMessages = true;
         queuedUpdateMessages = [];
       });
       socket.on('disconnect', function() {
         console.log('[HMR] Websocket connection lost.');
+        document.dispatchEvent(new CustomEvent('hmr:disconnected', { detail: true }))
       });
       var acceptNewModules = function(msg) {
         // Make sure we don't accept new modules before we've synced ourselves.
@@ -507,12 +509,11 @@ function main(
         moduleHotApply({ignoreUnaccepted: ignoreUnaccepted}, function(err, updatedNames) {
           if (err) {
             console.error('[HMR] Error applying update', err);
+            document.dispatchEvent(new CustomEvent('hmr:error', { detail: err }))
           }
           if (updatedNames) {
             console.log('[HMR] Updated modules', updatedNames);
-            setTimeout(function(){
-              if (window.location) location.reload();
-            },300);
+            document.dispatchEvent(new CustomEvent('hmr:updated', { detail: updatedNames }))
             if (outdatedModules.length !== updatedNames.length) {
               var notUpdatedNames = filter(outdatedModules, function(name) {
                 return updatedNames.indexOf(name) === -1;
